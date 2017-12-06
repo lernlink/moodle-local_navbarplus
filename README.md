@@ -9,7 +9,7 @@ Moodle plugin which enhances the functionality of Moodle's page header navbar.
 Requirements
 ------------
 
-This plugin requires Moodle 3.2+
+This plugin requires Moodle 3.3+
 
 
 Motivation for this plugin
@@ -44,16 +44,19 @@ With this setting you can add link icons to the header navbar left to the icons 
 Each line consists of an icon image, a link URL, a text, supported language(s) (optional) and new window setting (optional) - separated by pipe characters. Each icon needs to be written in a new line. For example:
 
 ```
-a/help|http://moodle.org|Moodle|en,de|true
+fa-question|http://moodle.org|Moodle|en,de|true|hidden-small-down
 fa-sign-out|/login/logout.php|Logout||false
 ```
 
 Further information to the parameters:
-* Image: You can add identifiers for a Moodle icon from the pix folder (<a href="https://github.com/moodle/moodle/tree/master/pix">see the icon list on github.com</a>) or a Font Awesome icon identifier (<a href="http://fontawesome.io/icons/">See the icon list on fontawesome.io</a>). Font Awesome is neither included in Moodle's core Clean nor Boost theme, but there are some Boost child themes and other solutions from third parties which add Font Awesome support to Moodle.
+* Image: You can add Font Awesome icon identifiers (<a href="http://fontawesome.io/icons/">See the icon list on fontawesome.io</a>). Font Awesome is included in Moodle's core Clean and Boost themes since the version 3.3.
 * Link: The link target can be defined by a full web URL (e.g. https://moodle.org) or a relative path within your Moodle instance (e.g. /login/logout.php).
 * Title: This text will be written in the title and alt attributes of the icon.
 * Supported language(s) (optional): This setting can be used for displaying the link to users of the specified language only. Separate more than one supported language with commas. If the link should be displayed in all languages, then leave this field empty.
 * New window (optional): By default the link will be opened in the same window and the value of this setting is set to false. If you want to open the link in a new window set the value to true.
+* Additional classes (optional): You can add individual classes with this optional parameter. A common use case might be to add Bootstrap's responsive classes to hide an icon for specific display sizes. You can look up the definitions for the responsive Bootstrap classes for <a href="https://v4-alpha.getbootstrap.com/layout/responsive-utilities/">Bootstrap version 4</a> (for all Boost based themes) or for <a href="http://getbootstrap.com/2.3.2/scaffolding.html#responsive">Bootstrap version 2</a> (for all Boostrapbase based themes).
+The most important classes for Boost based themes might be "hidden-sm-down" for hiding an icon on small devices or "hidden-sm-up" for only displaying the icon on small screens.
+* ID (optional): You can add an individual ID to your icon element. This makes it possible to address this specific icon easily with CSS (for example for the Moodle user tours). The string you enter here will always be prefixed with "localnavbarplus-".
 
 Please note:
 * Pipe dividing for optional parameters is always needed if they are located between other options. This means that you have to separate params with the pipe character although they are empty. Also see the example for the Font Awesome icon above.
@@ -61,10 +64,18 @@ Please note:
 
 ### 2. Reset user tour link
 
-With this setting you can place a Font Awesome map icon in the navbar with which the user is able to restart the user tour for the current page. By default Boost places the link to reset the user tour within the footer. This might not be eye cathing. With this setting you can place the link to the more visible navbar.
+With this setting you can place a Font Awesome map icon in the navbar with which the user is able to restart the user tour for the current page. By default Boost places the link to reset the user tour within the footer. This might not be eye catching. With this setting you can place the link to the more visible navbar.
 
 Please note:
-As there is no even vaguely fitting icon in the Moodle core, we have no fallback for themes that do not implement Font Awesome (from Moodle 3.3 onwards this will be integrated into Moodle core). If you use such a theme this setting will have no affect.
+
+If you want to change this icon, you can do this within your own Custom CSS / RAW SCSS section of your theme. This is the CSS code you need:
+```
+#local_navbarplus_resetusertour i.fa::before {
+   content: "\f11d";
+}
+```
+Please replace this example "content" code with your desired Font Awesome icon's unicode.
+
 
 How this plugin works / Pitfalls
 --------------------------------
@@ -164,9 +175,8 @@ If you want to use this plugin with a RTL language and it doesn't work as-is, yo
 PHP7 Support
 ------------
 
-Since Moodle 3.0, Moodle core basically supports PHP7.
-Please note that PHP7 support is on our roadmap for this plugin, but it has not yet been thoroughly tested for PHP7 support and we are still running it in production on PHP5.
-If you encounter any success or failure with this plugin and PHP7, please let us know.
+Since Moodle 3.0, Moodle core basically supports PHP7. This plugin has been thoroughly tested for PHP7 support.
+If you encounter any success or failure with this plugin and the older PHP5 version, please let us know.
 
 
 Copyright

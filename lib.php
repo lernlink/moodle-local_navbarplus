@@ -56,13 +56,14 @@ function local_navbarplus_render_navbar_output() {
             $itemtitle = null;
             $itemvisible = false;
             $itemopeninnewwindow = false;
+            $itemadditionalclasses = null;
 
             // Make a new array on delimiter "|".
             $settings = explode('|', $line);
             // Check for the mandatory conditions first.
-            // If array contains too less or too many items, do not proceed and therefore do not display the item.
+            // If array contains too less or too many settings, do not proceed and therefore do not display the item.
             // Furthermore check it at least the first three mandatory params are not an empty string.
-            if (count($settings) >= 3 && count($settings) <= 5 &&
+            if (count($settings) >= 3 && count($settings) <= 7 &&
                 $settings[0] !== '' && $settings[1] !== '' && $settings[2] !== '') {
                 foreach ($settings as $i => $setting) {
                     $setting = trim($setting);
@@ -70,14 +71,10 @@ function local_navbarplus_render_navbar_output() {
                         switch ($i) {
                             // Check for the mandatory first param: icon.
                             case 0:
-                                $moodlepixpattern = '~^[a-z]/[\w\d-_]+$~';
                                 $faiconpattern = '~^fa-[\w\d-]+$~';
-                                // Check if it's a Moodle pix icon.
-                                if (preg_match($moodlepixpattern, $setting) > 0) {
-                                    $itemicon = $OUTPUT->pix_icon($setting, '');
-                                    $itemvisible = true;
-                                } else if (preg_match($faiconpattern, $setting) > 0) { // Check if it's a Font Awesome icon.
-                                    $itemicon = '<i class="fa ' . $setting . '"></i>';
+                                // Check if it's matching the Font Awesome pattern.
+                                if (preg_match($faiconpattern, $setting) > 0) {
+                                    $itemicon = '<i class="fa ' . $setting . ' icon"></i>';
                                     $itemvisible = true;
                                 }
                                 break;
@@ -108,27 +105,48 @@ function local_navbarplus_render_navbar_output() {
                                 break;
                             // Check for the optional fifth param: the target attribute.
                             case 4:
-                                if ($setting == 'true') {
+                                // Only set this value if the item is set to visible so far.
+                                // Especially to keep the language check.
+                                if ($setting == 'true' && $itemvisible == true) {
                                     $itemopeninnewwindow = true;
-                                    $itemvisible = true;
                                 }
+                                break;
+                            // Check for optional sixth parameter: additional classes.
+                            case 5:
+                                $itemadditionalclasses = $setting;
+                                break;
+                            // Check for optional seventh parameter: additional id.
+                            case 6:
+                                $itemid = $setting;
                                 break;
                         }
                     }
                 }
             }
-            // Add link with icon as a child to the sourrounding div only if it should be displayed.
+            // Add link with icon as a child to the surrounding div only if it should be displayed.
             // This is if all mandatory params are set and the item matches the optional given language setting.
             if ($itemvisible) {
                 // Set attributes for title and alt.
-                $attributes = array('alt' => $itemtitle, 'title' => $itemtitle);
+                $linkattributes = array('alt' => $itemtitle, 'title' => $itemtitle);
                 // If optional param for itemopeninnewwindow is set to true add a target=_blank to the link.
                 if ($itemopeninnewwindow) {
                     $attributes['target'] = '_blank';
                 }
+                // Define classes for all icons.
+                $itemclasses = 'localnavbarplus nav-link';
+                // Add optional individual classes.
+                if (!empty($itemadditionalclasses)) {
+                    $itemclasses .= ' ' . $itemadditionalclasses;
+                }
+                // Initialise attribute array for the div tag.
+                $divattributes['class'] = $itemclasses;
+                // Add optional individual id prefixed with plugin name.
+                if (!empty($itemid)) {
+                    $divattributes['id'] = 'localnavbarplus-' . $itemid;
+                }
                 // Add the link to the HTML.
-                $output .= html_writer::start_tag('div', array('class' => 'localnavbarplus nav-link'));
-                $output .= html_writer::link($itemurl, $itemicon, $attributes);
+                $output .= html_writer::start_tag('div', $divattributes);
+                $output .= html_writer::link($itemurl, $itemicon, $linkattributes);
                 $output .= html_writer::end_tag('div');
             }
 
